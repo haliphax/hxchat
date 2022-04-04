@@ -1,0 +1,27 @@
+version: '3'
+
+services:
+  nginx:
+    depends_on:
+      - traefik
+    image: nginx:latest
+    restart: unless-stopped
+    volumes:
+      - ./html:/usr/share/nginx/html:ro
+    labels:
+      - traefik.http.routers.hxchat.entrypoints=websecure
+      - traefik.http.routers.hxchat.rule=Host(`localhost`)
+      - traefik.http.routers.hxchat.service=hxchat
+      - traefik.http.routers.hxchat.tls=true
+      - traefik.http.services.hxchat.loadbalancer.server.port=80
+
+  traefik:
+    image: traefik:2.6
+    ports:
+      - 80:80
+      - 443:443
+    restart: unless-stopped
+    volumes:
+      - ./traefik.yml:/traefik.yml:ro
+      - /etc/localtime:/etc/localtime:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro

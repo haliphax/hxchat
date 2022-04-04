@@ -1,0 +1,138 @@
+html, body {
+	height: 100vh;
+	margin: 0;
+	min-height: 100vh;
+	min-width: 100vw;
+	overflow: hidden;
+	padding: 0;
+	width: 100vw;
+}
+
+body {
+	background-color: #555;
+	color: #fff;
+	font-family: 'Unifont', Arial, Helvetica, sans-serif;
+	font-size: 22px;
+}
+
+.messages {
+	bottom: 0;
+	display: block;
+	margin: 0;
+	padding: 0;
+	position: absolute;
+	width: 100%;
+}
+
+.message {
+	background-color: rgba(0, 0, 0, 0.9);
+	display: block;
+	left: 0;
+	line-height: 1.2;
+	list-style: none;
+	padding: 0.25rem 0.5rem;
+	position: relative;
+	text-shadow: 0 0 4px #000;
+	word-wrap: break-word;
+}
+
+.message.highlight {
+	filter: invert(1);
+}
+
+.message.dead {
+	display: none !important;
+}
+
+.message.displaying {
+	animation: 1s ease-out slide-in;
+}
+
+.message.expired {
+	animation: 1s ease-in slide-out;
+}
+
+@keyframes slide-in {
+	from {
+		height: 0;
+	}
+}
+
+@keyframes slide-out {
+	to {
+		opacity: 0;
+	}
+}
+
+.user {
+	display: block;
+}
+
+.badge {
+	height: 0.8em;
+	margin: auto 0.1em auto 0.1em;
+	vertical-align: middle;
+	width: 0.8em;
+}
+
+.username {
+	font-weight: bold;
+}
+
+.text {
+	display: block;
+}
+
+.emote {
+	height: auto;
+	margin: -0.3em auto;
+	position: relative;
+	vertical-align: middle;
+	width: 1.5em;
+	z-index: 100;
+}
+
+.text.emote-only .emote {
+	margin: 0 auto;
+	width: 3em;
+}
+
+@keyframes float {
+	0% {
+		transform: translatey(0px);
+	}
+	50% {
+		transform: translatey(-1em);
+	}
+	100% {
+		transform: translatey(0px);
+	}
+}
+
+@keyframes glow {
+	0% {
+		text-shadow: 0 0 0 #f0f;
+	}
+	50% {
+		text-shadow: 0 0 0.5em #f0f;
+	}
+	100% {
+		text-shadow: 0 0 0 #f0f;
+	}
+}
+
+.text.emote-only.yuge .emote {
+	animation-name: float;
+	animation-duration: 4s;
+	animation-iteration-count: infinite;
+	animation-timing-function: ease-in-out;
+	margin-top: 1em;
+	width: 6em;
+}
+
+.text.broadcaster {
+	animation-name: glow;
+	animation-duration: 2s;
+	animation-iteration-count: infinite;
+	animation-timing-function: ease-in-out;
+}
