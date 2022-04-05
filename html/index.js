@@ -1,5 +1,5 @@
 import constants from './constants.js'
-import { isBroadcaster, twitchClient } from "./twitch.js";
+import { isBroadcaster, twitchClient } from './twitch.js';
 import { hash, hs } from './util.js';
 
 for (let prop of ['channel', 'oauth']) {
