@@ -143,7 +143,7 @@ Vue.component('chat-message', {
 				}
 			}
 
-			if (this.message.tags.username == hs.channel) {
+			if (isBroadcaster(this.message.tags)) {
 				classes.push('broadcaster');
 			}
 
