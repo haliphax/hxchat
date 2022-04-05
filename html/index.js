@@ -1,8 +1,8 @@
 import constants from './constants.js'
-import { twitchClient } from "./twitch.js";
+import { isBroadcaster, twitchClient } from "./twitch.js";
 import { hs } from './util.js';
 
-for (let prop of ['channel', 'oauth', 'username']) {
+for (let prop of ['channel', 'oauth']) {
 	if (!hs.hasOwnProperty(prop)) {
 		window.location = constants.OAUTH_URL;
 	}
@@ -13,23 +13,40 @@ const headers = new Headers({
 	'Client-ID': constants.CLIENT_ID,
 });
 
-/** configuration object */
+/** user object */
 const user = await fetch(
 	`https://api.twitch.tv/helix/users?login=${hs.channel}`,
 	{ headers })
 	.then(r => r.json())
 	.then(j => j.data[0]);
+
 /** channel badges */
-const channelBadges = await fetch(
+const channelBadges = {};
+
+await fetch(
 	`https://api.twitch.tv/helix/chat/badges?broadcaster_id=${user.id}`,
 	{ headers })
 	.then(r => r.json())
-	.then(j => j.data);
+	.then(j => j.data.map(v => {
+		const badges = {};
+
+		v.versions.map(v2 => badges[v2.id] = v2);
+		channelBadges[v.set_id] = badges;
+	}));
+
 /** global badges */
-const globalBadges = await fetch(
-	'https://badges.twitch.tv/v1/badges/global/display')
+const globalBadges = {}
+
+await fetch(
+	'https://api.twitch.tv/helix/chat/badges/global',
+	{ headers })
 	.then(r => r.json())
-	.then(j => j.badge_sets);
+	.then(j => j.data.map(v => {
+		const badges = {};
+
+		v.versions.map(v2 => badges[v2.id] = v2);
+		globalBadges[v.set_id] = badges;
+	}));
 
 /** vue shared store */
 const store = new Vue({
@@ -64,7 +81,7 @@ Vue.component('chat-message', {
 				const pool = (channelBadges.hasOwnProperty(v)
 					? channelBadges : globalBadges);
 
-				return pool[v]?.versions[version]?.image_url_1x;
+				return pool[v]?.[version]?.image_url_1x;
 			});
 		},
 		messageClasses() {
