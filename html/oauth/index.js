@@ -1,15 +1,17 @@
+import constants from '../constants.js';
 import { hs } from '../util.js';
 
-const form = document.querySelector('form');
+const user = await fetch(
+	'https://api.twitch.tv/helix/users',
+	{
+		headers: new Headers({
+			'Authorization': `Bearer ${hs.access_token}`,
+			'Client-ID': constants.CLIENT_ID,
+		})
+	})
+	.then(r => r.json())
+	.then(j => j.data[0]);
 
-const onChange = e => {
-	const rgx = RegExp(`&${e.target.id}=[^&]+`);
-
-	form.action = form.action.replace(rgx, '');
-	form.action =
-		`${form.action}&${e.target.id}=${encodeURIComponent(e.target.value)}`;
-};
-
-form.setAttribute('action', `${form.action}#oauth=${hs.access_token}`);
-form.querySelectorAll('input')
-	.forEach(v => v.addEventListener('change', onChange));
+window.location = window.location.href.replace(
+	/\/oauth(?:\/index\.html)?.*$/i,
+	`#oauth=${hs.access_token}&channel=${user.login}`);
