@@ -11,9 +11,9 @@
 		<h1>Overlay URL builder</h1>
 		<p>
 			Use this form to construct your overlay URL. <code>Channel</code> should
-			be your Twitch username, and <code>Bot username</code> should be
-			the username of the account your token is authorized for. (Most likely,
-			that's <em>your</em> username unless you have a separate bot account.)
+			be your Twitch username. This must also be the user for which the
+			overlay has been authorized or else subscriber badges will not display
+			properly.
 		</p>
 		<p>
 			After submitting the form, you will be taken to the live overlay. Copy
@@ -25,10 +25,6 @@
 				<p>
 					<label for="channel">Channel:</label>
 					<input type="text" id="channel" placeholder="haliphax" required />
-				</p>
-				<p>
-					<label for="username">Bot username:</label>
-					<input type="text" id="username" placeholder="phaxb0t" required />
 				</p>
 				<p>
 					<button type="submit">Go!</button>

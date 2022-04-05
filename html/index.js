@@ -8,22 +8,23 @@ for (let prop of ['channel', 'oauth', 'username']) {
 	}
 }
 
+const headers = new Headers({
+	'Authorization': `Bearer ${hs.oauth}`,
+	'Client-ID': constants.CLIENT_ID,
+});
+
 /** configuration object */
 const user = await fetch(
-	`https://api.twitch.tv/helix/users?login=${hs.username}`,
-	{
-		headers: new Headers({
-			'Authorization': `Bearer ${hs.oauth}`,
-			'Client-ID': constants.CLIENT_ID,
-		}),
-	})
+	`https://api.twitch.tv/helix/users?login=${hs.channel}`,
+	{ headers })
 	.then(r => r.json())
 	.then(j => j.data[0]);
 /** channel badges */
 const channelBadges = await fetch(
-	`https://badges.twitch.tv/v1/badges/channels/${user.id}/display`)
+	`https://api.twitch.tv/helix/chat/badges?broadcaster_id=${user.id}`,
+	{ headers })
 	.then(r => r.json())
-	.then(j => j.badge_sets);
+	.then(j => j.data);
 /** global badges */
 const globalBadges = await fetch(
 	'https://badges.twitch.tv/v1/badges/global/display')
@@ -142,7 +143,7 @@ Vue.component('chat-message', {
 				}
 			}
 
-			if (this.message.tags.username == hs.username) {
+			if (this.message.tags.username == hs.channel) {
 				classes.push('broadcaster');
 			}
 

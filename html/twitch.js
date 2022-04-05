@@ -4,7 +4,7 @@ import { hs } from './util.js';
 const twitchClient = () => new tmi.Client({
 	channels: [hs.channel],
 	identity: {
-		username: hs.username,
+		username: hs.channel,
 		password: `oauth:${hs.oauth}`,
 	},
 	options: { debug: true, },
