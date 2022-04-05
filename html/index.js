@@ -1,6 +1,6 @@
 import constants from './constants.js'
 import { isBroadcaster, twitchClient } from "./twitch.js";
-import { hs } from './util.js';
+import { hash, hs } from './util.js';
 
 for (let prop of ['channel', 'oauth']) {
 	if (!hs.hasOwnProperty(prop)) {
@@ -84,12 +84,27 @@ Vue.component('chat-message', {
 				return pool[v]?.[version]?.image_url_1x;
 			});
 		},
+		color() {
+			if (this.message.tags.hasOwnProperty('color')) {
+				return this.message.tags['color'];
+			}
+
+			return `#${hash(this.message.tags['display-name']).substring(0, 6)}`;
+		},
 		messageClasses() {
 			const classes = ['message'];
 
-			if (this.message.displaying) { classes.push('displaying'); }
-			if (this.message.expired) { classes.push('expired'); }
-			if (this.message.dead) { classes.push('dead'); }
+			if (this.message.displaying) {
+				classes.push('displaying');
+			}
+
+			if (this.message.expired) {
+				classes.push('expired');
+			}
+
+			if (this.message.dead) {
+				classes.push('dead');
+			}
 
 			if (this.message.tags['msg-id'] == 'highlighted-message') {
 				classes.push('highlight');
@@ -174,7 +189,7 @@ Vue.component('chat-message', {
 				<span class="badges">
 					<img class="badge" v-for="badge in badges" :src="badge" />
 				</span>
-				<span class="username" :style="{ color: message.tags['color'] }">
+				<span class="username" :style="{ color: color }">
 					{{ message.tags['display-name'] }}
 				</span>
 			</span>
