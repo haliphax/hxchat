@@ -63,7 +63,7 @@ Vue.component('chat-message', {
 				const pool = (channelBadges.hasOwnProperty(v)
 					? channelBadges : globalBadges);
 
-				return pool[v].versions[version].image_url_1x;
+				return pool[v]?.versions[version]?.image_url_1x;
 			});
 		},
 		messageClasses() {
