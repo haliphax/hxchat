@@ -30,6 +30,7 @@ body {
 	left: 0;
 	line-height: 1.2;
 	list-style: none;
+	max-height: 50vh;
 	padding: 0.25rem 0.5rem;
 	position: relative;
 	text-shadow: 0 0 4px #000;
@@ -45,22 +46,22 @@ body {
 }
 
 .message.displaying {
-	animation: 1s ease-out slide-in;
+	animation: 2s ease-out slide-in;
 }
 
 .message.expired {
-	animation: 1s ease-in slide-out;
+	animation: .5s ease-in slide-out;
 }
 
 @keyframes slide-in {
 	from {
-		height: 0;
+		max-height: 0;
 	}
 }
 
 @keyframes slide-out {
 	to {
-		opacity: 0;
+		left: 100vw;
 	}
 }
 
@@ -99,13 +100,28 @@ body {
 
 @keyframes float {
 	0% {
-		transform: translatey(0px);
+		top: 0;
 	}
 	50% {
-		transform: translatey(-1em);
+		top: -1em;
 	}
 	100% {
-		transform: translatey(0px);
+		top: 0;
+	}
+}
+
+@keyframes scan {
+	0% {
+		transform: translatex(0);
+	}
+	25% {
+		transform: translatex(calc(-50vw + 56px));
+	}
+	50% {
+		transform: translatex(0);
+	}
+	75% {
+		transform: translatex(calc(50vw - 56px));
 	}
 }
 
@@ -122,12 +138,11 @@ body {
 }
 
 .text.emote-only.yuge .emote {
-	animation-name: float;
-	animation-duration: 4s;
-	animation-iteration-count: infinite;
-	animation-timing-function: ease-in-out;
+	animation: float 4s infinite ease-in-out, scan 4s infinite linear;
+	display: block;
+	margin-left: auto;
 	margin-top: 1em;
-	width: 6em;
+	width: 112px;
 }
 
 .text.broadcaster {
