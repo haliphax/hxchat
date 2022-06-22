@@ -11,7 +11,20 @@ html, body {
 body {
 	background-color: #555;
 	color: #fff;
-	font-family: 'Unifont', Arial, Helvetica, sans-serif;
+	font-family: 'Unifont',
+		ui-monospace,
+		'Menlo',
+		'Monaco',
+		'Cascadia Mono',
+		'Segoe UI Mono',
+		'Roboto Mono',
+		'Oxygen Mono',
+		'Ubuntu Monospace',
+		'Source Code Pro',
+		'Fira Mono',
+		'Droid Sans Mono',
+		'Courier New',
+		monospace;
 	font-size: 22px;
 }
 
