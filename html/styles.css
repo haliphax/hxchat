@@ -26,6 +26,8 @@ body {
 		'Courier New',
 		monospace;
 	font-size: 22px;
+	image-rendering: crisp-edges;
+	image-rendering: pixelated;
 }
 
 .messages {
@@ -113,28 +115,13 @@ body {
 
 @keyframes float {
 	0% {
-		top: 0;
+		transform: translateY(0);
 	}
 	50% {
-		top: -1em;
+		transform: translateY(-1em);
 	}
 	100% {
-		top: 0;
-	}
-}
-
-@keyframes scan {
-	0% {
-		transform: translatex(0);
-	}
-	25% {
-		transform: translatex(calc(-50vw + 56px));
-	}
-	50% {
-		transform: translatex(0);
-	}
-	75% {
-		transform: translatex(calc(50vw - 56px));
+		transform: translateY(0);
 	}
 }
 
@@ -151,11 +138,11 @@ body {
 }
 
 .text.emote-only.yuge .emote {
-	animation: float 4s infinite ease-in-out, scan 4s infinite linear;
+	animation: float 3s infinite ease-in-out;
 	display: block;
 	margin-left: auto;
 	margin-top: 1em;
-	width: 112px;
+	width: 50%;
 }
 
 .text.broadcaster {
