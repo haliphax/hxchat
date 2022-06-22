@@ -56,11 +56,6 @@ const store = new Vue({
 });
 
 Vue.component('chat-message', {
-	data() {
-		return {
-			store: store,
-		}
-	},
 	methods: {
 		animationEnd(e) {
 			if (e.animationName == 'slide-in') {
