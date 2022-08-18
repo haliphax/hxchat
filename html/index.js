@@ -84,7 +84,11 @@ Vue.component('chat-message', {
 				return this.message.tags['color'];
 			}
 
-			return `#${hash(this.message.tags['display-name']).substring(0, 6)}`;
+			const generatedColor =
+				hash(this.message.tags['display-name'] || this.message.tags.username)
+					.substring(0, 6);
+
+			return `#${generatedColor}`;
 		},
 		messageClasses() {
 			const classes = ['message'];
