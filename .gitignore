@@ -1,2 +1,3 @@
+.python-version
 docker-compose.override.yml
 html/tmi.min.js
