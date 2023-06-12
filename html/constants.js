@@ -1,8 +1,10 @@
+import { hs } from "./util.js";
+
 const constants = {
 	/** number of milliseconds between cleanup sweeps */
 	CLEANUP_TIMER: 10 * 1000,
 	/** number of milliseconds before messages disappear */
-	DESTRUCT_TIMER: 90 * 1000,
+	DESTRUCT_TIMER: (hs.lifetime ?? 90) * 1000,
 	CLIENT_ID: '0k7bszf8tyc215ocmvp5hiuo7y5nsr',
 	OAUTH_REDIRECT_URI: '',
 	OAUTH_URL: '',
