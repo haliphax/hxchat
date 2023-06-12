@@ -225,7 +225,15 @@ Vue.component("chat-overlay", {
 /** Twitch client */
 const twitch = twitchClient();
 
+/** usernames to exclude from display */
+const exclude = (hs.exclude?.replace(/\+|%20/g, " ").split(" ") ?? [])
+	.map(v => v.toLowerCase());
+
 twitch.on("message", (channel, tags, message, self) => {
+	if (exclude.includes(tags.username.toLowerCase())) {
+		return;
+	}
+
 	store.messages.push({
 		message: message,
 		tags: tags,
@@ -238,6 +246,7 @@ twitch.on("message", (channel, tags, message, self) => {
 		store.messages.find((v) => !v.expired).expired = true;
 	}, constants.DESTRUCT_TIMER);
 
+	// scroll message into view if enabled
 	if (hs.scroll) {
 		requestAnimationFrame(() =>
 			document.querySelector(".messages").scrollIntoView({
@@ -250,6 +259,7 @@ twitch.on("message", (channel, tags, message, self) => {
 });
 twitch.connect();
 
+// cleanup routine
 setInterval(() => {
 	if (store.messages.length === 0) {
 		return;
