@@ -59,11 +59,23 @@ const store = new Vue({
 	},
 });
 
+/** scroll message into view if enabled */
+const scrollMessagesIntoView = () =>
+	hs.scroll &&
+	requestAnimationFrame(() =>
+		document.querySelector(".messages").scrollIntoView({
+			behavior: "smooth",
+			block: "end",
+			inline: "start",
+		})
+	);
+
 Vue.component("chat-message", {
 	methods: {
 		animationEnd(e) {
 			if (e.animationName == "slide-in") {
 				this.message.displaying = false;
+				scrollMessagesIntoView();
 			} else if (e.animationName == "slide-out") {
 				this.message.dead = true;
 			}
@@ -251,16 +263,7 @@ twitch.on("message", (channel, tags, message, self) => {
 		store.messages.find((v) => !v.expired).expired = true;
 	}, constants.DESTRUCT_TIMER);
 
-	// scroll message into view if enabled
-	if (hs.scroll) {
-		requestAnimationFrame(() =>
-			document.querySelector(".messages").scrollIntoView({
-				behavior: "smooth",
-				block: "end",
-				inline: "start",
-			})
-		);
-	}
+	scrollMessagesIntoView();
 });
 twitch.connect();
 
