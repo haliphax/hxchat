@@ -228,6 +228,16 @@ twitch.on('message', (channel, tags, message, self) => {
 	setTimeout(
 		() => { store.messages.find(v => !v.expired).expired = true; },
 		constants.DESTRUCT_TIMER);
+
+	if (hs.scroll) {
+		requestAnimationFrame(() =>
+			document.querySelector('.messages').scrollIntoView({
+				behavior: "smooth",
+				block: "end",
+				inline: "start",
+			})
+		);
+	}
 });
 twitch.connect();
 
@@ -245,6 +255,7 @@ setInterval(
 
 		store.messages.splice(0, idx < 0 ? store.messages.length : idx);
 	},
-	constants.CLEANUP_TIMER);
+	constants.CLEANUP_TIMER
+);
 
 new Vue({ el: 'body > div:first-child' });
