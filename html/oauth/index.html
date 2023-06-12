@@ -2,12 +2,33 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<title>Chat overlay authorization | haliphax.dev</title>
+		<title>Chat overlay authorization/options | haliphax.dev</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<link rel="icon" href="../favicon.gif" />
 	</head>
 	<body>
-		<p>Redirecting you to the overlay...</p>
+		<form action="">
+			<fieldset>
+				<legend>Options</legend>
+				<p>
+					<label for="lifetime">Message lifetime (in seconds):</label>
+					<br />
+					<input type="number" id="lifetime" />
+				</p>
+				<p>
+					<input type="checkbox" id="nocommand" />
+					<label for="nocommand">Hide commands</label>
+				</p>
+				<p>
+					<label for="exclude">Exclude:</label>
+					<br />
+					<input type="text" id="exclude" placeholder="Space-separated usernames" />
+				</p>
+			</fieldset>
+			<p>
+				<button type="submit">Go!</button>
+			</p>
+		</form>
 		<script type="module" src="index.js"></script>
 	</body>
 </html>

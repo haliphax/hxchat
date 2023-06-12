@@ -12,6 +12,26 @@ const user = await fetch(
 	.then(r => r.json())
 	.then(j => j.data[0]);
 
-window.location = window.location.href.replace(
+const form = document.querySelector('form');
+
+form.action = window.location.href.replace(
 	/\/oauth(?:\/index\.html)?.*$/i,
 	`#oauth=${hs.access_token}&channel=${user.login}`);
+
+form.addEventListener('submit', ev => {
+	if (document.getElementById('nocommand').checked) {
+		form.action += "&nocommand=1";
+	}
+
+	const exclude = document.getElementById('exclude').value;
+
+	if (exclude) {
+		form.action += `&exclude=${encodeURIComponent(exclude)}`;
+	}
+
+	const lifetime = document.getElementById('lifetime').value;
+
+	if (lifetime) {
+		form.action += `&lifetime=${encodeURIComponent(lifetime)}`;
+	}
+});
