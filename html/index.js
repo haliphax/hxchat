@@ -1,52 +1,56 @@
-import constants from './constants.js'
-import { isBroadcaster, twitchClient } from './twitch.js';
-import { hash, hs } from './util.js';
+import constants from "./constants.js";
+import { isBroadcaster, twitchClient } from "./twitch.js";
+import { hash, hs } from "./util.js";
 
-for (let prop of ['channel', 'oauth']) {
+for (let prop of ["channel", "oauth"]) {
 	if (!hs.hasOwnProperty(prop)) {
 		window.location = constants.OAUTH_URL;
 	}
 }
 
 const headers = new Headers({
-	'Authorization': `Bearer ${hs.oauth}`,
-	'Client-ID': constants.CLIENT_ID,
+	Authorization: `Bearer ${hs.oauth}`,
+	"Client-ID": constants.CLIENT_ID,
 });
 
 /** user object */
 const user = await fetch(
 	`https://api.twitch.tv/helix/users?login=${hs.channel}`,
-	{ headers })
-	.then(r => r.json())
-	.then(j => j.data[0]);
+	{ headers }
+)
+	.then((r) => r.json())
+	.then((j) => j.data[0]);
 
 /** channel badges */
 const channelBadges = {};
 
 await fetch(
 	`https://api.twitch.tv/helix/chat/badges?broadcaster_id=${user.id}`,
-	{ headers })
-	.then(r => r.json())
-	.then(j => j.data.map(v => {
-		const badges = {};
+	{ headers }
+)
+	.then((r) => r.json())
+	.then((j) =>
+		j.data.map((v) => {
+			const badges = {};
 
-		v.versions.map(v2 => badges[v2.id] = v2);
-		channelBadges[v.set_id] = badges;
-	}));
+			v.versions.map((v2) => (badges[v2.id] = v2));
+			channelBadges[v.set_id] = badges;
+		})
+	);
 
 /** global badges */
-const globalBadges = {}
+const globalBadges = {};
 
-await fetch(
-	'https://api.twitch.tv/helix/chat/badges/global',
-	{ headers })
-	.then(r => r.json())
-	.then(j => j.data.map(v => {
-		const badges = {};
+await fetch("https://api.twitch.tv/helix/chat/badges/global", { headers })
+	.then((r) => r.json())
+	.then((j) =>
+		j.data.map((v) => {
+			const badges = {};
 
-		v.versions.map(v2 => badges[v2.id] = v2);
-		globalBadges[v.set_id] = badges;
-	}));
+			v.versions.map((v2) => (badges[v2.id] = v2));
+			globalBadges[v.set_id] = badges;
+		})
+	);
 
 /** vue shared store */
 const store = new Vue({
@@ -55,65 +59,65 @@ const store = new Vue({
 	},
 });
 
-Vue.component('chat-message', {
+Vue.component("chat-message", {
 	methods: {
 		animationEnd(e) {
-			if (e.animationName == 'slide-in') {
+			if (e.animationName == "slide-in") {
 				this.message.displaying = false;
-			}
-			else if (e.animationName == 'slide-out') {
+			} else if (e.animationName == "slide-out") {
 				this.message.dead = true;
 			}
 		},
 		clean(text) {
-			return text.replace(/\x01/g, '&lt;');
+			return text.replace(/\x01/g, "&lt;");
 		},
 	},
 	computed: {
 		badges() {
-			return Object.keys(this.message.tags.badges || {}).map(v => {
+			return Object.keys(this.message.tags.badges || {}).map((v) => {
 				const version = this.message.tags.badges[v];
-				const pool = (channelBadges.hasOwnProperty(v)
-					? channelBadges : globalBadges);
+				const pool = channelBadges.hasOwnProperty(v)
+					? channelBadges
+					: globalBadges;
 
 				return pool[v]?.[version]?.image_url_1x;
 			});
 		},
 		color() {
-			if (this.message.tags.hasOwnProperty('color')) {
-				return this.message.tags['color'];
+			if (this.message.tags.hasOwnProperty("color")) {
+				return this.message.tags["color"];
 			}
 
-			const generatedColor =
-				hash(this.message.tags['display-name'] || this.message.tags.username)
-					.substring(0, 6);
+			const generatedColor = hash(
+				this.message.tags["display-name"] || this.message.tags.username
+			).substring(0, 6);
 
 			return `#${generatedColor}`;
 		},
 		messageClasses() {
-			const classes = ['message'];
+			const classes = ["message"];
 
 			if (this.message.displaying) {
-				classes.push('displaying');
+				classes.push("displaying");
 			}
 
 			if (this.message.expired) {
-				classes.push('expired');
+				classes.push("expired");
 			}
 
 			if (this.message.dead) {
-				classes.push('dead');
+				classes.push("dead");
 			}
 
-			if (this.message.tags['msg-id'] == 'highlighted-message') {
-				classes.push('highlight');
+			if (this.message.tags["msg-id"] == "highlighted-message") {
+				classes.push("highlight");
 			}
 
 			return classes;
 		},
 		parsedMessage() {
 			const message = this.message;
-			let parsed = message.message.replace(/</g, '\x01');
+			let parsed = message.message.replace(/</g, "\x01");
 
 			if (message.tags.emotes === null) {
 				return this.clean(parsed);
@@ -125,7 +129,7 @@ Vue.component('chat-message', {
 				const emote = message.tags.emotes[key];
 
 				for (const range of emote) {
-					const split = range.split('-');
+					const split = range.split("-");
 
 					all.push({
 						emote: key,
@@ -141,22 +145,27 @@ Vue.component('chat-message', {
 
 			for (const emote of all) {
 				const tag = `<img class="emote" src="https://static-cdn.jtvnw.net/emoticons/v2/${emote.emote}/default/dark/1.0" />`;
-				const keyword = parsed.slice(offset + emote.start, offset + emote.end + 1);
+				const keyword = parsed.slice(
+					offset + emote.start,
+					offset + emote.end + 1
+				);
 
-				parsed = parsed.slice(0, offset + emote.start)
-					+ tag + parsed.slice(offset + emote.end + 1);
+				parsed =
+					parsed.slice(0, offset + emote.start) +
+					tag +
+					parsed.slice(offset + emote.end + 1);
 				offset = offset + tag.length - keyword.length;
 			}
 
-			return this.clean(parsed).replace(/> </g, '><');
+			return this.clean(parsed).replace(/> </g, "><");
 		},
 		processedMessage() {
 			let message = this.parsedMessage;
 
-			if (this.textClasses.indexOf('emote-only') > 0) {
+			if (this.textClasses.indexOf("emote-only") > 0) {
 				message = message.replace(/\/1.0"/g, '/2.0"');
 
-				if (this.textClasses.indexOf('yuge') > 0) {
+				if (this.textClasses.indexOf("yuge") > 0) {
 					message = message.replace(/\/2.0"/g, '/3.0"');
 				}
 			}
@@ -164,25 +173,25 @@ Vue.component('chat-message', {
 			return message;
 		},
 		textClasses() {
-			const classes = ['text'];
+			const classes = ["text"];
 
-			if (this.parsedMessage.replace(/<[^>]+>/g, '').trim().length === 0) {
-				classes.push('emote-only');
+			if (this.parsedMessage.replace(/<[^>]+>/g, "").trim().length === 0) {
+				classes.push("emote-only");
 
-				if (this.parsedMessage.trim().lastIndexOf('<') === 0) {
-					classes.push('yuge');
+				if (this.parsedMessage.trim().lastIndexOf("<") === 0) {
+					classes.push("yuge");
 				}
 			}
 
 			if (isBroadcaster(this.message.tags)) {
-				classes.push('broadcaster');
+				classes.push("broadcaster");
 			}
 
 			return classes;
 		},
 	},
-	props: ['message'],
-	template: /*html*/`
+	props: ["message"],
+	template: /*html*/ `
 		<li :class="messageClasses" @animationend="animationEnd">
 			<span class="user">
 				<span class="badges">
@@ -198,13 +207,13 @@ Vue.component('chat-message', {
 	`,
 });
 
-Vue.component('chat-overlay', {
+Vue.component("chat-overlay", {
 	data() {
 		return {
 			store: store,
 		};
 	},
-	template: /*html*/`
+	template: /*html*/ `
 		<ul class="messages">
 			<chat-message v-for="m in store.messages" v-if="!m.dead"
 				:key="m.id" :message="m">
@@ -216,7 +225,7 @@ Vue.component('chat-overlay', {
 /** Twitch client */
 const twitch = twitchClient();
 
-twitch.on('message', (channel, tags, message, self) => {
+twitch.on("message", (channel, tags, message, self) => {
 	store.messages.push({
 		message: message,
 		tags: tags,
@@ -225,13 +234,13 @@ twitch.on('message', (channel, tags, message, self) => {
 		dead: false,
 	});
 
-	setTimeout(
-		() => { store.messages.find(v => !v.expired).expired = true; },
-		constants.DESTRUCT_TIMER);
+	setTimeout(() => {
+		store.messages.find((v) => !v.expired).expired = true;
+	}, constants.DESTRUCT_TIMER);
 
 	if (hs.scroll) {
 		requestAnimationFrame(() =>
-			document.querySelector('.messages').scrollIntoView({
+			document.querySelector(".messages").scrollIntoView({
 				behavior: "smooth",
 				block: "end",
 				inline: "start",
@@ -241,21 +250,18 @@ twitch.on('message', (channel, tags, message, self) => {
 });
 twitch.connect();
 
-setInterval(
-	() => {
-		if (store.messages.length === 0) {
-			return;
-		}
+setInterval(() => {
+	if (store.messages.length === 0) {
+		return;
+	}
 
-		const idx = store.messages.findIndex(v => !v.dead);
+	const idx = store.messages.findIndex((v) => !v.dead);
 
-		if (idx === 0) {
-			return;
-		}
+	if (idx === 0) {
+		return;
+	}
 
-		store.messages.splice(0, idx < 0 ? store.messages.length : idx);
-	},
-	constants.CLEANUP_TIMER
-);
+	store.messages.splice(0, idx < 0 ? store.messages.length : idx);
+}, constants.CLEANUP_TIMER);
 
-new Vue({ el: 'body > div:first-child' });
+new Vue({ el: "body > div:first-child" });
