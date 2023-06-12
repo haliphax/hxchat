@@ -226,8 +226,9 @@ Vue.component("chat-overlay", {
 const twitch = twitchClient();
 
 /** usernames to exclude from display */
-const exclude = (hs.exclude?.replace(/\+|%20/g, " ").split(" ") ?? [])
-	.map(v => v.toLowerCase());
+const exclude = (hs.exclude?.replace(/\+|%20/g, " ").split(" ") ?? []).map(
+	(v) => v.toLowerCase()
+);
 
 twitch.on("message", (channel, tags, message, self) => {
 	if (exclude.includes(tags.username.toLowerCase())) {
