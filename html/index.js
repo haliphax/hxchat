@@ -234,6 +234,10 @@ twitch.on("message", (channel, tags, message, self) => {
 		return;
 	}
 
+	if (hs.nocommand && message.startsWith("!")) {
+		return;
+	}
+
 	store.messages.push({
 		message: message,
 		tags: tags,
