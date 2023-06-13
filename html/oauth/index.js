@@ -18,19 +18,19 @@ form.action = window.location.href.replace(
 );
 
 form.addEventListener("submit", (ev) => {
-	if (document.getElementById("nocommand").checked) {
-		form.action += "&nocommand=1";
-	}
+	// toggles
+	["nocommand", "scroll"].forEach((toggle) => {
+		if (document.getElementById(toggle).checked) {
+			form.action += `&${toggle}=1`;
+		}
+	});
 
-	const exclude = document.getElementById("exclude").value;
+	// options
+	["exclude", "lifetime"].forEach((option) => {
+		const value = document.getElementById(option).value;
 
-	if (exclude) {
-		form.action += `&exclude=${encodeURIComponent(exclude)}`;
-	}
-
-	const lifetime = document.getElementById("lifetime").value;
-
-	if (lifetime) {
-		form.action += `&lifetime=${encodeURIComponent(lifetime)}`;
-	}
+		if (value) {
+			form.action += `&${option}=${encodeURIComponent(value)}`;
+		}
+	});
 });

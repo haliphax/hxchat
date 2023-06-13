@@ -9,15 +9,42 @@
 	<body>
 		<form action="">
 			<fieldset>
+				<legend>Toggles</legend>
+				<p>
+					<input type="checkbox" id="scroll" aria-describedby="scroll-desc" />
+					<label for="scroll">Scroll latest message into view</label>
+					<br />
+					<small id="scroll-desc">
+						Useful when CSS causes new messages to appear at the top of the
+						screen rather than the bottom.
+					</small>
+				</p>
+				<p>
+					<input
+						type="checkbox"
+						id="nocommand"
+						aria-describedby="nocommand-desc"
+					/>
+					<label for="nocommand">Hide commands</label>
+					<br />
+					<small id="nocommand-desc">
+						Prevents messages that begin with <code>!</code> from appearing in
+						the overlay.
+					</small>
+				</p>
+			</fieldset>
+			<fieldset>
 				<legend>Options</legend>
 				<p>
 					<label for="lifetime">Message lifetime (in seconds):</label>
 					<br />
-					<input type="number" id="lifetime" />
-				</p>
-				<p>
-					<input type="checkbox" id="nocommand" />
-					<label for="nocommand">Hide commands</label>
+					<input type="number" id="lifetime" aria-describedby="lifetime-desc" />
+					<br />
+					<small>
+						The number of seconds a message will be visible before triggering
+						the <code>slide-out</code> animation. If left blank, the default
+						value of <code>90</code> seconds will be used.
+					</small>
 				</p>
 				<p>
 					<label for="exclude">Exclude:</label>
@@ -26,7 +53,14 @@
 						type="text"
 						id="exclude"
 						placeholder="Space-separated usernames"
+						aria-describedby="exclude-desc"
 					/>
+					<br />
+					<small>
+						A space-separated list of usernames (case-insensitive) whose
+						messages will not be displayed in the overlay. Useful for preventing
+						bot chatter.
+					</small>
 				</p>
 			</fieldset>
 			<p>
