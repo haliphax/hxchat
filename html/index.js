@@ -265,6 +265,39 @@ twitch.on("message", (channel, tags, message, self) => {
 
 	scrollMessagesIntoView();
 });
+
+twitch.on("clearchat", (channel) =>
+	store.messages.splice(0, store.messages.length)
+);
+
+twitch.on("messagedeleted", (channel, username, deletedMessage, tags) => {
+	const idx = store.messages.findIndex(
+		(v) => v.tags["id"] === tags["target-msg-id"]
+	);
+
+	if (idx >= 0) {
+		store.messages.splice(idx, 1);
+	}
+});
+
+const bannedOrTimedOut = (channel, username) => {
+	const msgIndexes = [];
+	const lowered = username.toLowerCase();
+
+	for (let i = 0; i < store.messages.length; i++) {
+		if (store.messages[i].tags.username === lowered) {
+			msgIndexes.push(i);
+		}
+	}
+
+	for (let index of msgIndexes) {
+		store.messages.splice(index);
+	}
+};
+
+twitch.on("ban", bannedOrTimedOut);
+twitch.on("timeout", bannedOrTimedOut);
+
 twitch.connect();
 
 // cleanup routine
