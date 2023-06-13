@@ -1,5 +1,5 @@
 import constants from "./constants.js";
-import { isBroadcaster, isModerator, twitchClient } from "./twitch.js";
+import { authHeaders, isBroadcaster, isModerator, twitchClient } from "./twitch.js";
 import { hash, hs } from "./util.js";
 
 for (let prop of ["channel", "oauth"]) {
@@ -8,10 +8,7 @@ for (let prop of ["channel", "oauth"]) {
 	}
 }
 
-const headers = new Headers({
-	Authorization: `Bearer ${hs.oauth}`,
-	"Client-ID": constants.CLIENT_ID,
-});
+const headers = authHeaders();
 
 /** user object */
 const user = await fetch(
@@ -73,10 +70,10 @@ const scrollMessagesIntoView = () =>
 Vue.component("chat-message", {
 	methods: {
 		animationEnd(e) {
-			if (e.animationName == "slide-in") {
+			if (e.animationName === "slide-in") {
 				this.message.displaying = false;
 				scrollMessagesIntoView();
-			} else if (e.animationName == "slide-out") {
+			} else if (e.animationName === "slide-out") {
 				this.message.dead = true;
 			}
 		},
@@ -121,7 +118,7 @@ Vue.component("chat-message", {
 				classes.push("dead");
 			}
 
-			if (this.message.tags["msg-id"] == "highlighted-message") {
+			if (this.message.tags["msg-id"] === "highlighted-message") {
 				classes.push("highlight");
 			}
 

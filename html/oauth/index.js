@@ -1,12 +1,9 @@
-import constants from "../constants.js";
+import { authHeaders } from "../twitch.js";
 import { hs } from "../util.js";
 
-const user = await fetch("https://api.twitch.tv/helix/users", {
-	headers: new Headers({
-		Authorization: `Bearer ${hs.access_token}`,
-		"Client-ID": constants.CLIENT_ID,
-	}),
-})
+const headers = authHeaders("access_token");
+
+const user = await fetch("https://api.twitch.tv/helix/users", { headers })
 	.then((r) => r.json())
 	.then((j) => j.data[0]);
 

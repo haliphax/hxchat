@@ -1,4 +1,20 @@
+import constants from "./constants.js";
 import { hs } from "./util.js";
+
+/**
+ * Twitch API auth headers
+ * @param {string} tokenKey Optional key to use when pulling the auth token from
+ * the current URL's hash string; defaults to `oauth` if unset
+ * @returns {Headers} The HTTP headers to use for Twitch API authentication
+ */
+const authHeaders = (tokenKey) => {
+	const token = tokenKey ? hs[tokenKey] : hs.oauth;
+
+	return new Headers({
+		Authorization: `Bearer ${token}`,
+		"Client-ID": constants.CLIENT_ID,
+	});
+};
 
 /** Twitch client */
 const twitchClient = () =>
@@ -17,4 +33,4 @@ const isBroadcaster = (tags) =>
 /** based on tags, is this user a moderator? */
 const isModerator = (tags) => tags.mod;
 
-export { isBroadcaster, isModerator, twitchClient };
+export { authHeaders, isBroadcaster, isModerator, twitchClient };
