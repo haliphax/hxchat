@@ -1,5 +1,5 @@
 import constants from "./constants.js";
-import { isBroadcaster, twitchClient } from "./twitch.js";
+import { isBroadcaster, isModerator, twitchClient } from "./twitch.js";
 import { hash, hs } from "./util.js";
 
 for (let prop of ["channel", "oauth"]) {
@@ -234,20 +234,69 @@ Vue.component("chat-overlay", {
 	`,
 });
 
-/** Twitch client */
-const twitch = twitchClient();
-
 /** usernames to exclude from display */
 const exclude = (hs.exclude?.replace(/\+|%20/g, " ").split(" ") ?? []).map(
 	(v) => v.toLowerCase()
 );
 
-twitch.on("message", (channel, tags, message, self) => {
-	if (exclude.includes(tags.username.toLowerCase())) {
+// cleanup routine
+setInterval(() => {
+	if (store.messages.length === 0) {
 		return;
 	}
 
-	if (hs.nocommand && message.startsWith("!")) {
+	const idx = store.messages.findIndex((v) => !v.dead);
+
+	if (idx === 0) {
+		return;
+	}
+
+	store.messages.splice(0, idx < 0 ? store.messages.length : idx);
+}, constants.CLEANUP_TIMER);
+
+// vue app
+new Vue({ el: "body > div:first-child" });
+
+/** Twitch client */
+const twitch = twitchClient();
+
+/** clear all chat messages */
+const clearChat = () => store.messages.splice(0, store.messages.length);
+
+/** user was banned or timed-out; remove their messages only */
+const bannedOrTimedOut = (channel, username) => {
+	const msgIndexes = [];
+	const lowered = username.toLowerCase();
+
+	for (let i = 0; i < store.messages.length; i++) {
+		if (store.messages[i].tags.username === lowered) {
+			msgIndexes.push(i);
+		}
+	}
+
+	for (let index of msgIndexes) {
+		store.messages.splice(index);
+	}
+};
+
+//--- twitch event handlers ----------------------------------------------------
+
+twitch.on("ban", bannedOrTimedOut);
+
+twitch.on("clearchat", clearChat);
+
+twitch.on("message", (channel, tags, message, self) => {
+	if (message.startsWith("!")) {
+		if ((isModerator(tags) || isBroadcaster(tags)) && message === "!clear") {
+			return clearChat();
+		}
+
+		if (hs.nocommand) {
+			return;
+		}
+	}
+
+	if (exclude.includes(tags.username)) {
 		return;
 	}
 
@@ -266,10 +315,6 @@ twitch.on("message", (channel, tags, message, self) => {
 	scrollMessagesIntoView();
 });
 
-twitch.on("clearchat", (channel) =>
-	store.messages.splice(0, store.messages.length)
-);
-
 twitch.on("messagedeleted", (channel, username, deletedMessage, tags) => {
 	const idx = store.messages.findIndex(
 		(v) => v.tags["id"] === tags["target-msg-id"]
@@ -280,39 +325,6 @@ twitch.on("messagedeleted", (channel, username, deletedMessage, tags) => {
 	}
 });
 
-const bannedOrTimedOut = (channel, username) => {
-	const msgIndexes = [];
-	const lowered = username.toLowerCase();
-
-	for (let i = 0; i < store.messages.length; i++) {
-		if (store.messages[i].tags.username === lowered) {
-			msgIndexes.push(i);
-		}
-	}
-
-	for (let index of msgIndexes) {
-		store.messages.splice(index);
-	}
-};
-
-twitch.on("ban", bannedOrTimedOut);
 twitch.on("timeout", bannedOrTimedOut);
 
 twitch.connect();
-
-// cleanup routine
-setInterval(() => {
-	if (store.messages.length === 0) {
-		return;
-	}
-
-	const idx = store.messages.findIndex((v) => !v.dead);
-
-	if (idx === 0) {
-		return;
-	}
-
-	store.messages.splice(0, idx < 0 ? store.messages.length : idx);
-}, constants.CLEANUP_TIMER);
-
-new Vue({ el: "body > div:first-child" });
