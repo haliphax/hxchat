@@ -11,7 +11,7 @@ const form = document.querySelector("form");
 
 form.action = window.location.href.replace(
 	/\/oauth(?:\/index\.html)?.*$/i,
-	`#oauth=${hs.access_token}&channel=${user.login}`
+	`#oauth=${hs.access_token}&channel=${user.login}`,
 );
 
 form.addEventListener("submit", (ev) => {

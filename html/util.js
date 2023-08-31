@@ -13,7 +13,7 @@ const hs = Object.fromEntries(
 	window.location.hash
 		.substring(1)
 		?.split("&")
-		.map((v) => v.split("=")) ?? []
+		.map((v) => v.split("=")) ?? [],
 );
 
 export { hash, hs };

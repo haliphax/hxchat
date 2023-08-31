@@ -13,6 +13,5 @@ service's homepage will launch the OAuth flow and eventually take you to the
 overlay page. Copy and paste the overlay's URL into your streaming software of
 choice as a browser source.
 
-
 [official instance]: https://haliphax.github.io/hxchat
 [twitch]: https://twitch.tv

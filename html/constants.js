@@ -11,7 +11,7 @@ const constants = {
 };
 
 constants.OAUTH_REDIRECT_URI = encodeURIComponent(
-	window.location.href.replace(/(?:\/index\.html)?$/i, "oauth")
+	window.location.href.replace(/(?:\/index\.html)?$/i, "oauth"),
 );
 
 constants.OAUTH_URL =

@@ -1,5 +1,10 @@
 import constants from "./constants.js";
-import { authHeaders, isBroadcaster, isModerator, twitchClient } from "./twitch.js";
+import {
+	authHeaders,
+	isBroadcaster,
+	isModerator,
+	twitchClient,
+} from "./twitch.js";
 import { hash, hs } from "./util.js";
 
 for (let prop of ["channel", "oauth"]) {
@@ -13,7 +18,7 @@ const headers = authHeaders();
 /** user object */
 const user = await fetch(
 	`https://api.twitch.tv/helix/users?login=${hs.channel}`,
-	{ headers }
+	{ headers },
 )
 	.then((r) => r.json())
 	.then((j) => j.data[0]);
@@ -23,7 +28,7 @@ const channelBadges = {};
 
 await fetch(
 	`https://api.twitch.tv/helix/chat/badges?broadcaster_id=${user.id}`,
-	{ headers }
+	{ headers },
 )
 	.then((r) => r.json())
 	.then((j) =>
@@ -32,7 +37,7 @@ await fetch(
 
 			v.versions.map((v2) => (badges[v2.id] = v2));
 			channelBadges[v.set_id] = badges;
-		})
+		}),
 	);
 
 /** global badges */
@@ -46,7 +51,7 @@ await fetch("https://api.twitch.tv/helix/chat/badges/global", { headers })
 
 			v.versions.map((v2) => (badges[v2.id] = v2));
 			globalBadges[v.set_id] = badges;
-		})
+		}),
 	);
 
 /** vue shared store */
@@ -64,7 +69,7 @@ const scrollMessagesIntoView = () =>
 			behavior: "smooth",
 			block: "end",
 			inline: "start",
-		})
+		}),
 	);
 
 Vue.component("chat-message", {
@@ -98,7 +103,7 @@ Vue.component("chat-message", {
 			}
 
 			const generatedColor = hash(
-				this.message.tags["display-name"] || this.message.tags.username
+				this.message.tags["display-name"] || this.message.tags.username,
 			).substring(0, 6);
 
 			return `#${generatedColor}`;
@@ -156,7 +161,7 @@ Vue.component("chat-message", {
 				const tag = `<img class="emote" src="https://static-cdn.jtvnw.net/emoticons/v2/${emote.emote}/default/dark/1.0" />`;
 				const keyword = parsed.slice(
 					offset + emote.start,
-					offset + emote.end + 1
+					offset + emote.end + 1,
 				);
 
 				parsed =
@@ -233,7 +238,7 @@ Vue.component("chat-overlay", {
 
 /** usernames to exclude from display */
 const exclude = (hs.exclude?.replace(/\+|%20/g, " ").split(" ") ?? []).map(
-	(v) => v.toLowerCase()
+	(v) => v.toLowerCase(),
 );
 
 // cleanup routine
@@ -314,7 +319,7 @@ twitch.on("message", (channel, tags, message, self) => {
 
 twitch.on("messagedeleted", (channel, username, deletedMessage, tags) => {
 	const idx = store.messages.findIndex(
-		(v) => v.tags["id"] === tags["target-msg-id"]
+		(v) => v.tags["id"] === tags["target-msg-id"],
 	);
 
 	if (idx >= 0) {
