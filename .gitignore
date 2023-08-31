@@ -1,3 +1,5 @@
-.python-version
-docker-compose.override.yml
-html/tmi.min.js
+/.python-version
+/docker-compose.override.yml
+/html/tmi.min.js
+node_modules/
+
