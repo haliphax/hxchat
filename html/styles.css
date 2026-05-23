@@ -36,6 +36,7 @@ body {
 	line-height: 1.2;
 	list-style: none;
 	max-height: 50vh;
+	overflow-y: hidden;
 	padding: 0.25rem 0.5rem;
 	position: relative;
 	text-shadow: 0 0 4px #000;
